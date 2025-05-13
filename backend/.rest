@@ -12,7 +12,7 @@ Content-type:application/json
   "name": "test",
   "email": "test@example.com",
   "password": "Jcwdlove",
-  "userName": "test",
+  "userName": "test", 
   "role": "admin"
 }
 ### DELETE User
@@ -42,4 +42,23 @@ Content-Type:application/json
   "email": "adrey2@example.com",
   "password": "Jcwdlove",
   "role":"super-admin"
+}
+
+### Get all Employee 
+GET {{baseUrl}}/api/employee
+
+### Create Employee
+POST {{baseUrl}}/api/employee
+Content-Type:"application/json"
+
+{
+  "FirstName": "Jane",
+  "LastName": "Smith",
+  "Email": "jane.smith@example.com",
+  "PhoneNumber": "+1987654321",
+  "HireDate": "2019-11-20",
+  "JobTitle": "HR Manager",
+  "DepartmentId": "HR001",
+  "SupervisorId": "EMP200",
+  "status": "Active"
 }

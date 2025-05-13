@@ -1,62 +1,36 @@
 import employeeModel from "../models/employeeModel.js";
 
-class employeeService {
+class EmployeeService {
+  // Class name should be PascalCase
   async createEmployee(userData) {
-    try {
-      const newEmployee = new employeeModel(userData);
-
-      await newEmployee.save();
-      return newEmployee;
-    } catch (error) {
-      throw error;
-    }
+    const newEmployee = new employeeModel(userData);
+    const user =  await newEmployee.save();
+    return user;
   }
 
   async getEmployees() {
-    try {
-      const data = await employeeModel.find({});
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async updateEmployee(id, userData) {
-    try {
-      const employee = await employeeModel.findByIdAndUpdate(id, userData, {
-        new: true,
-      });
-
-      if (!employee) throw new Error("Employee not found");
-
-      return employee;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async deleteEmployee(id) {
-    try {
-      const user = await employeeModel.findByIdAndDelete(id);
-
-      if (!user) throw new Error("Employee not found!");
-
-      return { message: "Employee Deleted Successfully" };
-    } catch (error) {
-      throw error;
-    }
+    return await employeeModel.find({});
   }
 
   async getEmployeeId(id) {
-    try {
-      const user = await employeeModel.findById(id);
+    const employee = await employeeModel.findById(id);
+    if (!employee) throw new Error("Employee not found!");
+    return employee;
+  }
 
-      if (!user) throw new Error("Employee not found!");
-      return user;
-    } catch (error) {
-      throw error;
-    }
+  async updateEmployee(id, userData) {
+    const employee = await employeeModel.findByIdAndUpdate(id, userData, {
+      new: true,
+    });
+    if (!employee) throw new Error("Employee not found");
+    return employee;
+  }
+
+  async deleteEmployee(id) {
+    const result = await employeeModel.findByIdAndDelete(id);
+    if (!result) throw new Error("Employee not found!");
+    return { message: "Employee Deleted Successfully" };
   }
 }
 
-export default employeeService;
+export default new EmployeeService(); // Export an instance

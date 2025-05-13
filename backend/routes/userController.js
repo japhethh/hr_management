@@ -118,7 +118,7 @@ const updateUser = asyncHandler(async (req, res) => {
     const data = req.body;
     const { id } = req.body;
 
-    const updateUser = await userModel.findByIdAndUpdate({ _id: id }, data, {
+    const updateUser = await userModel.findByIdAndUpdate(id, data, {
       new: true,
     });
     if (!updateUser) res.status(404).json({ message: "User not found!" });

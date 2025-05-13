@@ -6,21 +6,23 @@ import { useState, useEffect } from "react"
 import { NavLink } from "react-router-dom"
 import {
   LayoutDashboard,
-  Settings,
   Users,
+  Briefcase,
+  Clock,
+  Award,
+  GraduationCap,
+  BarChart,
+  Building,
   Calendar,
-  FileText,
+  TrendingUp,
   LogOut,
   Menu,
-  NotebookText,
-  CreditCard,
-  Cog,
   ChevronRight,
   X,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "../ui/button"
 import { cn } from "@/lib/utils"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetContent } from "../ui/sheet"
 
 interface NavItemProps {
   to: string
@@ -112,10 +114,14 @@ const SubMenu = ({ icon: Icon, label, isCollapsed, children }: SubMenuProps) => 
   )
 }
 
-export default function Sidebar() {
+interface SidebarProps {
+  sidebarOpen: boolean
+  setSidebarOpen: (open: boolean) => void
+}
+
+export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Handle screen resize to detect mobile
   useEffect(() => {
@@ -139,6 +145,18 @@ export default function Sidebar() {
     return () => window.removeEventListener("resize", checkIfMobile)
   }, [isCollapsed])
 
+  // Close mobile menu when screen size changes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && sidebarOpen) {
+        setSidebarOpen(false)
+      }
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [sidebarOpen, setSidebarOpen])
+
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -158,13 +176,7 @@ export default function Sidebar() {
   }
 
   const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false)
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-    window.location.href = "/login"
+    setSidebarOpen(false)
   }
 
   // Sidebar content - shared between desktop and mobile
@@ -172,7 +184,7 @@ export default function Sidebar() {
     <>
       <div className="flex items-center justify-between p-4">
         {(!isCollapsed || isMobile) && (
-          <h2 className="font-semibold text-lg transition-opacity duration-200">Dashboard</h2>
+          <h2 className="font-semibold text-lg transition-opacity duration-200">HR System</h2>
         )}
         {!isMobile && (
           <Button
@@ -185,7 +197,11 @@ export default function Sidebar() {
             <Menu className="h-4 w-4" />
           </Button>
         )}
-
+        {isMobile && (
+          <Button variant="ghost" size="sm" className="p-2 rounded-full" onClick={closeMobileMenu} title="Close menu">
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <nav className="flex-1 flex flex-col p-2 space-y-1 overflow-y-auto">
@@ -197,41 +213,47 @@ export default function Sidebar() {
           onClick={isMobile ? closeMobileMenu : undefined}
         />
         <NavItem
-          to="/invoice-management"
-          icon={NotebookText}
-          label="Invoice Management"
+          to="/employees"
+          icon={Users}
+          label="Employees"
           isCollapsed={isCollapsed && !isMobile}
           onClick={isMobile ? closeMobileMenu : undefined}
         />
         <NavItem
-          to="/testUserList"
-          icon={NotebookText}
-          label="Test Userlist"
+          to="/recruitment"
+          icon={Briefcase}
+          label="Recruitment"
           isCollapsed={isCollapsed && !isMobile}
           onClick={isMobile ? closeMobileMenu : undefined}
         />
         <NavItem
-          to="/payment-process"
-          icon={CreditCard}
-          label="Payment Process"
+          to="/time-attendance"
+          icon={Clock}
+          label="Time & Attendance"
           isCollapsed={isCollapsed && !isMobile}
           onClick={isMobile ? closeMobileMenu : undefined}
         />
         <NavItem
-          to="/payment-gateway"
-          icon={Cog}
-          label="Payment Gateway"
+          to="/performance"
+          icon={Award}
+          label="Performance"
           isCollapsed={isCollapsed && !isMobile}
           onClick={isMobile ? closeMobileMenu : undefined}
         />
         <NavItem
-          to="/settings"
-          icon={Settings}
-          label="Settings"
+          to="/competency"
+          icon={GraduationCap}
+          label="Competency"
           isCollapsed={isCollapsed && !isMobile}
           onClick={isMobile ? closeMobileMenu : undefined}
         />
-
+        <NavItem
+          to="/analytics"
+          icon={BarChart}
+          label="HR Analytics"
+          isCollapsed={isCollapsed && !isMobile}
+          onClick={isMobile ? closeMobileMenu : undefined}
+        />
         {/* User Management SubMenu */}
         <SubMenu icon={Users} label="User Management" isCollapsed={isCollapsed && !isMobile}>
           <NavLink
@@ -259,49 +281,12 @@ export default function Sidebar() {
             Create User
           </NavLink>
         </SubMenu>
-
-        {/* Content SubMenu */}
-        <SubMenu icon={FileText} label="Content" isCollapsed={isCollapsed && !isMobile}>
-          <NavLink
-            to="/posts"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors w-full",
-                isActive ? "bg-accent text-accent-foreground" : "hover:bg-muted hover:text-muted-foreground",
-              )
-            }
-            onClick={isMobile ? closeMobileMenu : undefined}
-          >
-            Posts
-          </NavLink>
-          <NavLink
-            to="/media"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors w-full",
-                isActive ? "bg-accent text-accent-foreground" : "hover:bg-muted hover:text-muted-foreground",
-              )
-            }
-            onClick={isMobile ? closeMobileMenu : undefined}
-          >
-            Media
-          </NavLink>
-        </SubMenu>
-
-        <NavItem
-          to="/calendar"
-          icon={Calendar}
-          label="Calendar"
-          isCollapsed={isCollapsed && !isMobile}
-          onClick={isMobile ? closeMobileMenu : undefined}
-        />
       </nav>
 
       {/* Logout Button */}
       <div className="p-4 border-t">
         <Button
           variant="ghost"
-          onClick={handleLogout}
           className={cn(
             "w-full gap-3 transition-all duration-200",
             isCollapsed && !isMobile ? "justify-center" : "justify-start",
@@ -323,22 +308,10 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Menu Trigger */}
-      {isMobile && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="fixed top-4 left-4 z-40 p-2 rounded-full md:hidden bg-background shadow-sm"
-          onClick={() => setIsMobileMenuOpen(true)}
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      )}
-
       {/* Mobile Sidebar using Sheet component */}
       {isMobile && (
-        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px]">
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px]" closeButton={false}>
             <div className="h-full flex flex-col">
               <SidebarContent isMobile={true} />
             </div>

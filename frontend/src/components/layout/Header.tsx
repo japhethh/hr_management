@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import toast, { Toaster } from "react-hot-toast"
-import store from "@/contexts/AuthStore"
+import store, { apiURL } from "@/contexts/AuthStore"
 const Header = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -69,6 +69,7 @@ const Header = () => {
 
   const handleSubmit = async () => {
     console.log(formData)
+    console.log(user?._id)
     setIsSubmitting(true)
 
     try {
@@ -77,7 +78,7 @@ const Header = () => {
         return
       }
 
-      const response = await axios.post(`${apiURL}/api/user/update/${userData?._id}`, formData, {
+      const response = await axios.post(`${apiURL}/api/user/update`, { formData, id: user?._id }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -97,7 +98,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Add the Toaster component here */}
-      <Toaster position="top-right" />
+      <Toaster />
 
       <div className="w-full">
         <div className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">

@@ -18,6 +18,12 @@ import InvoiceManagement from "./pages/InvoiceManagement";
 import PaymentProcess from "./pages/PaymentProcess";
 import PaymentGateway from "./pages/PaymentGateway";
 import { UserList } from "./testing/UserList";
+import Competency from "./pages/Competency";
+import Employees from "./pages/Employees";
+import HRAnalytics from "./pages/HRAnalytics";
+import Performance from "./pages/Performance";
+import Recruitment from "./pages/Recruitment";
+import TimeAttendance from "./pages/TimeAttendance";
 
 
 interface AuthRouteProps {
@@ -52,6 +58,13 @@ const protectedRoutes = [
   { path: "/media", element: <MediaPage /> },
   { path: "/calendar", element: <CalendarPage /> },
   { path: "/testUserList", element: <UserList /> },
+  { path: "/competency", element: <Competency /> },
+  { path: "/employees", element: <Employees /> },
+  { path: "/analytics", element: <HRAnalytics /> },
+  { path: "/performance", element: <Performance /> },
+  { path: "/recruitment", element: <Recruitment /> },
+  { path: "/time-attendance", element: <TimeAttendance /> },
+
 ];
 
 const authRoutes = [
@@ -62,7 +75,6 @@ const authRoutes = [
 const App = () => {
   return (
     <AuthProvider>
-      <Toaster />
       <BrowserRouter>
         <Routes>
           {authRoutes.map((route) => (
