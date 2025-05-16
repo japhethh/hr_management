@@ -8,7 +8,10 @@ export const getEmployees = expressAsyncHandler(async (req, res) => {
 });
 
 export const createEmployee = expressAsyncHandler(async (req, res) => {
+  console.log(req.body);
   const newEmployee = await employeeService.createEmployee(req.body);
+
+  if (!newEmployee) res.status(404).json({ message: "Employee not found!" });
   res.status(201).json(newEmployee);
 });
 

@@ -7,6 +7,8 @@ import "dotenv/config";
 import { authMiddleware } from "./middleware/Auth.js";
 import cookieParser from "cookie-parser";
 import employeeRouter from "./routes/employeeRouter.js";
+import recruitmentRouter from "./routes/recruitmentRouter.js";
+import timeAttendanceRouter from "./routes/timeAttendanceRouter.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,6 +28,8 @@ app.get("/api/auth/check", authMiddleware, (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/employee", employeeRouter);
+app.use("/api/recruitments", recruitmentRouter);
+app.use("/api/time-attendance", timeAttendanceRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

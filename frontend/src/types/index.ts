@@ -24,3 +24,49 @@ export interface AuthResponse {
     email: string
   }
 }
+
+// Define Employee interface
+export interface Employee {
+  _id: string
+  FirstName?: string
+  LastName?: string
+  Email: string
+  PhoneNumber: string
+  HireDate: string
+  JobTitle: string
+  DepartmentId: string
+  SupervisorId: string | null
+  status: string
+}
+
+
+
+export interface Recruitment {
+  _id: string
+  title: string
+  department: string
+  postDate: string
+  status: "open" | "closed"
+  application: string
+}
+
+
+
+export interface TimeAttendance {
+  _id?: string
+  EmployeeId: string | Employee
+  workDate: Date | string
+  ClockIn?: string
+  ClockOut?: string
+  HoursWorked?: Date | string
+  Status: "Present" | "Absent" | "Leave" | "Late"
+}
+
+export interface AttendanceSummary {
+  total: number
+  present: number
+  absent: number
+  leave: number
+  late: number
+}
+

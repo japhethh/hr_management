@@ -7,6 +7,14 @@ export function cn(...inputs: ClassValue[]) {
 
 
 
+export const formatDate = (dateString: string | Date): string => {
+  if (!dateString) return "N/A"
+  const date = new Date(dateString)
+  return date.toLocaleDateString()
+}
+
+
+
 // Mock data for the application
 export const mockEmployees = [
   {
