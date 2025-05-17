@@ -35,7 +35,6 @@ app.use("/api/time-attendance", timeAttendanceRouter);
 app.use("/api/competency", competencyRouter);
 app.use("/api/hr-analytics", hrAnalyticsRouter);
 app.use("/api/performance-review", performanceReviewRouter);
-
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

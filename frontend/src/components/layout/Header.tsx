@@ -78,7 +78,7 @@ const Header = () => {
         return
       }
 
-      await axios.post(`${apiURL}/api/user/update`, { formData, id: user?._id }, {
+      await axios.post(`${apiURL}/api/user/update`, { formData, id: user?._id, }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

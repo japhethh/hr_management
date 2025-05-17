@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
 import { apiURL } from "@/contexts/AuthStore";
 
 const loginSchema = z.object({
@@ -69,7 +68,7 @@ export function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Login</CardTitle>
+          <CardTitle className="text-2xl text-center">Hr Management</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -128,7 +127,7 @@ export function LoginPage() {
             </form>
           </Form>
 
-          <div className="mt-4 text-center text-sm">
+          {/* <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}
             <Link
               to="/register"
@@ -136,7 +135,7 @@ export function LoginPage() {
             >
               Register
             </Link>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </div>

@@ -113,19 +113,27 @@ const testCreate = asyncHandler(async (req, res) => {
     });
   }
 });
+
 const updateUser = asyncHandler(async (req, res) => {
   try {
-    const data = req.body;
-    const { id } = req.body;
+    const { id, formData } = req.body; // Destructure id and the rest of the data
 
-    const updateUser = await userModel.findByIdAndUpdate(id, data, {
+    console.log("Updating user with ID:", id);
+    console.log(formData);
+    // console.log("Data:", data);
+
+    const updatedUser = await userModel.findByIdAndUpdate(id, formData, {
       new: true,
     });
-    if (!updateUser) res.status(404).json({ message: "User not found!" });
 
-    res.status(200).json(updateUser);
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+
+    res.status(200).json(updatedUser);
   } catch (error) {
-    console.log(error);
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
