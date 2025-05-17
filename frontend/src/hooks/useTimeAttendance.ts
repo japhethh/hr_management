@@ -59,6 +59,7 @@ export const useTimeAttendance = () => {
     mutationFn: ({ id, timeAttendanceData }: { id: string; timeAttendanceData: Partial<TimeAttendance> }) =>
       timeAttendanceApi.updateTimeAttendance(id, timeAttendanceData),
     onSuccess: (data, variables) => {
+      console.log(data)
       queryClient.invalidateQueries({ queryKey: ["time-attendance"] })
       queryClient.invalidateQueries({ queryKey: ["time-attendance", variables.id] })
       toast.success("Time attendance record updated successfully!")

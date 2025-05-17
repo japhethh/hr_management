@@ -38,6 +38,8 @@ export const useRecruitment = () => {
     mutationFn: ({ id, recruitmentData }: { id: string; recruitmentData: Omit<Recruitment, "_id"> }) =>
       recruitmentApi.updateRecruitment(id, recruitmentData),
     onSuccess: (data, variables) => {
+      console.log(data)
+
       queryClient.invalidateQueries({ queryKey: ["recruitment"] })
       queryClient.invalidateQueries({ queryKey: ["recruitment", variables.id] })
       toast.success("Recruitment entry updated successfully!")

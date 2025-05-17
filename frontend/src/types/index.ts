@@ -70,3 +70,110 @@ export interface AttendanceSummary {
   late: number
 }
 
+
+export interface Competency {
+  _id?: string
+  EmployeeID: string | Employee
+  SkillName: string
+  SkillLevel: "Beginner" | "Intermediate" | "Advanced" | "Expert"
+  Certification?: string
+  CertificationDate?: Date | string
+}
+
+export interface SkillDistribution {
+  Beginner: number
+  Intermediate: number
+  Advanced: number
+  Expert: number
+}
+
+export interface TopSkill {
+  _id: string // Skill name
+  count: number
+  averageLevel: number
+}
+
+export interface CertificationStats {
+  totalEmployees: number
+  withCertification: number
+  certificationRate: number
+}
+
+// Add this to your existing types file
+
+export interface HrAnalytics {
+  _id?: string
+  AnalyticsID: string
+  EmployeeID: string
+  ReviewID: string
+  AttendanceRate: string
+  AvgHoursWorked: string
+  CompentencyScore: string
+}
+
+export interface EmployeePerformanceMetric {
+  employeeId: string
+  employeeName: string
+  department: string
+  attendanceRate: number
+  avgHoursWorked: number
+  competencyScore: number
+  overallScore: number
+}
+
+export interface DepartmentPerformanceMetric {
+  department: string
+  employeeCount: number
+  avgAttendanceRate: string
+  avgHoursWorked: string
+  avgCompetencyScore: string
+}
+
+
+// Add these types to your existing types file
+
+export interface PerformanceReview {
+  _id: string
+  ReviewID: string
+  EmployeeID: string
+  ReviewPeriodStart: string
+  ReviewPeriodEnd: string
+  OverallRating: string
+  Strengths: string
+  AreasForImprovement: string
+  Comments: string
+}
+
+export interface ReviewStats {
+  totalReviews: number
+  averageRating: string
+  ratingDistribution: {
+    "1": number
+    "2": number
+    "3": number
+    "4": number
+    "5": number
+  }
+}
+
+export interface EmployeeSummary {
+  employeeId: string
+  totalReviews: number
+  averageRating: string
+  latestReview: PerformanceReview | null
+  ratingTrend: {
+    period: string
+    rating: number
+  }[]
+}
+
+export interface DepartmentSummary {
+  departmentId: string
+  employeeCount: number
+  totalReviews: number
+  averageRating: string
+}
+
+
+
+export interface TopPerformer extends EmployeePerformanceMetric { }

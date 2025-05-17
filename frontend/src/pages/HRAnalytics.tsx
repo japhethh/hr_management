@@ -1,222 +1,380 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table"
-import { mockHRAnalytics, mockEmployees } from "../lib/utils"
+"use client"
 
-const HRAnalytics = () => {
-  // Get employee name by ID
-  const getEmployeeName = (employeeId: number) => {
-    const employee = mockEmployees.find((emp) => emp.id === employeeId)
-    return employee ? `${employee.firstName} ${employee.lastName}` : "N/A"
+import { useState } from "react"
+import { useHrAnalytics } from "@/hooks/useHrAnalytics"
+import { useEmployee } from "@/hooks/useEmployee"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { HrAnalyticsTable } from "@/components/HrAnalyticsTable"
+import { PerformanceMetricsTable } from "@/components/PerformanceMetricsTable"
+import { DepartmentPerformanceCard } from "@/components/DepartmentPerformanceCard"
+import { BarChart, LineChart, RefreshCw, Users } from "lucide-react"
+import type { HrAnalytics } from "@/types"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+
+export default function HrAnalyticsPage() {
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("all")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [currentAnalytics, setCurrentAnalytics] = useState<Partial<HrAnalytics>>({
+    AnalyticsID: `ANA-${Date.now()}`,
+    ReviewID: `REV-${Date.now()}`,
+  })
+  const [isEditing, setIsEditing] = useState(false)
+
+  // Get employees
+  const { getEmployeeQuery } = useEmployee()
+  const { data: employees = [] } = getEmployeeQuery
+
+  // Get HR analytics data
+  const {
+    getHrAnalyticsQuery,
+    getHrAnalyticsByEmployeeIdQuery,
+    getEmployeePerformanceMetricsQuery,
+    getDepartmentPerformanceMetricsQuery,
+    getTopPerformersQuery,
+    createHrAnalyticsMutation,
+    updateHrAnalyticsMutation,
+    deleteHrAnalyticsMutation,
+    generateHrAnalyticsMutation,
+    generateAllHrAnalyticsMutation,
+  } = useHrAnalytics()
+
+  // Get all HR analytics records
+  const { data: allAnalytics = [], isLoading: isLoadingAllAnalytics } = getHrAnalyticsQuery
+
+  // Get HR analytics records for selected employee
+  const { data: employeeAnalytics = [], isLoading: isLoadingEmployeeAnalytics } =
+    getHrAnalyticsByEmployeeIdQuery(selectedEmployeeId)
+
+  // Get employee performance metrics
+  const { data: performanceMetrics = [], isLoading: isLoadingPerformanceMetrics } = getEmployeePerformanceMetricsQuery
+
+  // Get department performance metrics
+  const { data: departmentMetrics = [], isLoading: isLoadingDepartmentMetrics } = getDepartmentPerformanceMetricsQuery
+
+  // Get top performers
+  const { data: topPerformers = [], isLoading: isLoadingTopPerformers } = getTopPerformersQuery(5)
+
+  // Handle creating/updating an HR analytics record
+  const handleSaveAnalytics = () => {
+    if (!currentAnalytics.EmployeeID) {
+      alert("Please select an employee")
+      return
+    }
+
+    if (isEditing && currentAnalytics._id) {
+      updateHrAnalyticsMutation.mutate({
+        id: currentAnalytics._id,
+        hrAnalyticsData: currentAnalytics,
+      })
+    } else {
+      createHrAnalyticsMutation.mutate(currentAnalytics as HrAnalytics)
+    }
+
+    // Close dialog and reset form
+    setIsDialogOpen(false)
+    setCurrentAnalytics({
+      AnalyticsID: `ANA-${Date.now()}`,
+      ReviewID: `REV-${Date.now()}`,
+    })
+    setIsEditing(false)
   }
 
-  // Calculate average metrics
-  const avgAttendanceRate = mockHRAnalytics.reduce((acc, item) => acc + item.attendanceRate, 0) / mockHRAnalytics.length
-  const avgHoursWorked = mockHRAnalytics.reduce((acc, item) => acc + item.avgHoursWorked, 0) / mockHRAnalytics.length
-  const avgCompetencyScore =
-    mockHRAnalytics.reduce((acc, item) => acc + item.competencyScore, 0) / mockHRAnalytics.length
+  // Handle editing an HR analytics record
+  const handleEditAnalytics = (analytics: HrAnalytics) => {
+    setCurrentAnalytics({
+      ...analytics,
+    })
+    setIsEditing(true)
+    setIsDialogOpen(true)
+  }
+
+  // Handle deleting an HR analytics record
+  const handleDeleteAnalytics = (id: string) => {
+    if (confirm("Are you sure you want to delete this HR analytics record?")) {
+      deleteHrAnalyticsMutation.mutate(id)
+    }
+  }
+
+  // Handle generating HR analytics for an employee
+  const handleGenerateAnalytics = (employeeId: string) => {
+    generateHrAnalyticsMutation.mutate(employeeId)
+  }
+
+  // Handle generating HR analytics for all employees
+  const handleGenerateAllAnalytics = () => {
+    generateAllHrAnalyticsMutation.mutate()
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">HR Analytics</h1>
-        <p className="text-muted-foreground">Insights and metrics for HR management</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">HR Analytics</h1>
+          <p className="text-muted-foreground">Track and analyze employee performance metrics</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleGenerateAllAnalytics}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Generate All Analytics
+          </Button>
+          <Button
+            onClick={() => {
+              setCurrentAnalytics({
+                AnalyticsID: `ANA-${Date.now()}`,
+                ReviewID: `REV-${Date.now()}`,
+              })
+              setIsEditing(false)
+              setIsDialogOpen(true)
+            }}
+          >
+            Add Analytics Record
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{(avgAttendanceRate * 100).toFixed(1)}%</div>
-            <p className="text-xs text-muted-foreground">Average employee attendance rate</p>
-            <div className="mt-4 h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-              <div className="h-2 rounded-full bg-primary" style={{ width: `${avgAttendanceRate * 100}%` }}></div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Hours Worked</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgHoursWorked.toFixed(1)} hours</div>
-            <p className="text-xs text-muted-foreground">Average daily working hours</p>
-            <div className="mt-4 h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-              <div className="h-2 rounded-full bg-primary" style={{ width: `${(avgHoursWorked / 10) * 100}%` }}></div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Competency Score</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgCompetencyScore.toFixed(1)}</div>
-            <p className="text-xs text-muted-foreground">Average employee competency rating</p>
-            <div className="mt-4 h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-              <div
-                className="h-2 rounded-full bg-primary"
-                style={{ width: `${(avgCompetencyScore / 5) * 100}%` }}
-              ></div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
+      {/* Top Performers Card */}
       <Card>
         <CardHeader>
-          <CardTitle>Employee Performance Metrics</CardTitle>
-          <CardDescription>Detailed analytics for each employee</CardDescription>
+          <CardTitle>Top Performers</CardTitle>
+          <CardDescription>Employees with the highest overall performance scores</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Employee</TableHead>
-                <TableHead>Attendance Rate</TableHead>
-                <TableHead>Avg Hours Worked</TableHead>
-                <TableHead>Competency Score</TableHead>
-                <TableHead>Performance Index</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockHRAnalytics.map((analytics) => {
-                // Calculate a simple performance index
-                const performanceIndex =
-                  (analytics.attendanceRate * 0.3 +
-                    (analytics.avgHoursWorked / 10) * 0.3 +
-                    (analytics.competencyScore / 5) * 0.4) *
-                  100
-
-                return (
-                  <TableRow key={analytics.id}>
-                    <TableCell className="font-medium">{getEmployeeName(analytics.employeeId)}</TableCell>
-                    <TableCell>{(analytics.attendanceRate * 100).toFixed(1)}%</TableCell>
-                    <TableCell>{analytics.avgHoursWorked.toFixed(1)} hours</TableCell>
-                    <TableCell>{analytics.competencyScore.toFixed(1)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <div className="w-full mr-4">
-                          <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                            <div
-                              className={`h-2 rounded-full ${
-                                performanceIndex >= 80
-                                  ? "bg-green-500"
-                                  : performanceIndex >= 60
-                                    ? "bg-yellow-500"
-                                    : "bg-red-500"
-                              }`}
-                              style={{ width: `${performanceIndex}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <span className="text-sm font-medium">{performanceIndex.toFixed(1)}</span>
+          {isLoadingTopPerformers ? (
+            <div className="flex justify-center items-center h-40">
+              <p className="text-muted-foreground">Loading top performers...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {topPerformers.map((performer, index) => (
+                <Card key={performer.employeeId} className={index === 0 ? "border-2 border-yellow-400" : ""}>
+                  <CardContent className="p-4">
+                    <div className="flex flex-col items-center text-center space-y-2">
+                      <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center">
+                        <Users className="h-8 w-8 text-slate-500" />
                       </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+                      <div>
+                        <h3 className="font-semibold">{performer.employeeName}</h3>
+                        <p className="text-xs text-muted-foreground">{performer.department}</p>
+                      </div>
+                      <div className="text-2xl font-bold text-indigo-600">{performer.overallScore.toFixed(1)}</div>
+                      <p className="text-xs text-muted-foreground">Overall Score</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Department Performance</CardTitle>
-            <CardDescription>Average performance by department</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[200px] flex items-end justify-between">
-              <div className="flex flex-col items-center">
-                <div className="h-[160px] w-12 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Engineering</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[140px] w-12 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Design</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[100px] w-12 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Marketing</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[120px] w-12 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">HR</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[130px] w-12 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Finance</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Department Performance Card */}
+      <DepartmentPerformanceCard metrics={departmentMetrics} isLoading={isLoadingDepartmentMetrics} />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Attendance Trends</CardTitle>
-            <CardDescription>Monthly attendance rates</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[200px] flex items-end justify-between">
-              <div className="flex flex-col items-center">
-                <div className="h-[160px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Jan</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[150px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Feb</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[170px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Mar</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[140px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Apr</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[130px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">May</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[120px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Jun</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[110px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Jul</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[140px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Aug</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[150px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Sep</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[160px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Oct</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[150px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Nov</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="h-[140px] w-8 bg-primary rounded-t-md"></div>
-                <span className="mt-2 text-xs">Dec</span>
-              </div>
+      {/* Filter Controls */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filter Analytics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="employeeFilter">Filter by Employee</Label>
+              <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
+                <SelectTrigger id="employeeFilter">
+                  <SelectValue placeholder="Select employee" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Employees</SelectItem>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee._id} value={employee._id as string}>
+                      {employee.FirstName} {employee.LastName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* HR Analytics Records */}
+      <Tabs defaultValue="analytics">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="analytics">
+            <BarChart className="mr-2 h-4 w-4" />
+            Analytics Records
+          </TabsTrigger>
+          <TabsTrigger value="performance">
+            <LineChart className="mr-2 h-4 w-4" />
+            Performance Metrics
+          </TabsTrigger>
+          <TabsTrigger value="employee-analytics" disabled={selectedEmployeeId === "all"}>
+            <Users className="mr-2 h-4 w-4" />
+            Employee Analytics
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="analytics" className="space-y-4">
+          <Card>
+            <CardContent className="p-0">
+              <HrAnalyticsTable
+                analytics={allAnalytics}
+                isLoading={isLoadingAllAnalytics}
+                onEdit={handleEditAnalytics}
+                onDelete={handleDeleteAnalytics}
+                onGenerate={handleGenerateAnalytics}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-4">
+          <Card>
+            <CardContent className="p-0">
+              <PerformanceMetricsTable metrics={performanceMetrics} isLoading={isLoadingPerformanceMetrics} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="employee-analytics" className="space-y-4">
+          <Card>
+            <CardContent className="p-0">
+              <HrAnalyticsTable
+                analytics={employeeAnalytics}
+                isLoading={isLoadingEmployeeAnalytics}
+                onEdit={handleEditAnalytics}
+                onDelete={handleDeleteAnalytics}
+                onGenerate={handleGenerateAnalytics}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Add/Edit HR Analytics Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{isEditing ? "Edit HR Analytics" : "Add New HR Analytics"}</DialogTitle>
+            <DialogDescription>
+              {isEditing
+                ? "Update the HR analytics details below."
+                : "Enter the details for the new HR analytics record."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="analyticsId">Analytics ID</Label>
+              <Input
+                id="analyticsId"
+                value={currentAnalytics.AnalyticsID || ""}
+                onChange={(e) => setCurrentAnalytics({ ...currentAnalytics, AnalyticsID: e.target.value })}
+                placeholder="e.g. ANA-12345"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="employee">Employee</Label>
+              <Select
+                value={currentAnalytics.EmployeeID}
+                onValueChange={(value) => setCurrentAnalytics({ ...currentAnalytics, EmployeeID: value })}
+                disabled={isEditing}
+              >
+                <SelectTrigger id="employee">
+                  <SelectValue placeholder="Select employee" />
+                </SelectTrigger>
+                <SelectContent>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee._id} value={employee._id as string}>
+                      {employee.FirstName} {employee.LastName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reviewId">Review ID</Label>
+              <Input
+                id="reviewId"
+                value={currentAnalytics.ReviewID || ""}
+                onChange={(e) => setCurrentAnalytics({ ...currentAnalytics, ReviewID: e.target.value })}
+                placeholder="e.g. REV-12345"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="attendanceRate">Attendance Rate (%)</Label>
+              <Input
+                id="attendanceRate"
+                type="number"
+                min="0"
+                max="100"
+                value={currentAnalytics.AttendanceRate || ""}
+                onChange={(e) => setCurrentAnalytics({ ...currentAnalytics, AttendanceRate: e.target.value })}
+                placeholder="e.g. 95"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="avgHoursWorked">Average Hours Worked</Label>
+              <Input
+                id="avgHoursWorked"
+                type="number"
+                step="0.01"
+                min="0"
+                value={currentAnalytics.AvgHoursWorked || ""}
+                onChange={(e) => setCurrentAnalytics({ ...currentAnalytics, AvgHoursWorked: e.target.value })}
+                placeholder="e.g. 8.5"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="competencyScore">Competency Score</Label>
+              <Input
+                id="competencyScore"
+                type="number"
+                step="0.01"
+                min="0"
+                max="4"
+                value={currentAnalytics.CompentencyScore || ""}
+                onChange={(e) => setCurrentAnalytics({ ...currentAnalytics, CompentencyScore: e.target.value })}
+                placeholder="e.g. 3.5"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveAnalytics}
+              disabled={
+                createHrAnalyticsMutation.isPending ||
+                updateHrAnalyticsMutation.isPending ||
+                !currentAnalytics.EmployeeID
+              }
+            >
+              {createHrAnalyticsMutation.isPending || updateHrAnalyticsMutation.isPending
+                ? "Saving..."
+                : isEditing
+                  ? "Update"
+                  : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-
-export default HRAnalytics

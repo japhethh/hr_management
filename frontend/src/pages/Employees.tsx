@@ -69,7 +69,7 @@ interface EmployeeFormData {
 
 const EmployeeDataTable = () => {
   // React Query hooks
-  const { getEmployeeQuery, createEmployeeMutation, UpdateEmployeeMutation, deleteEmployee, getEmployeeId } =
+  const { getEmployeeQuery, createEmployeeMutation, UpdateEmployeeMutation, deleteEmployee } =
     useEmployee()
 
   // State for UI
@@ -542,7 +542,7 @@ const EmployeeDataTable = () => {
                     <Badge
                       variant={
                         employee.status === "Active"
-                          ? "success"
+                          ? "default"
                           : employee.status === "Inactive"
                             ? "destructive"
                             : "outline"

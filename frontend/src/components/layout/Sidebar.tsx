@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { NavLink } from "react-router-dom"
 import {
@@ -9,16 +8,13 @@ import {
   Users,
   Briefcase,
   Clock,
-  Award,
   GraduationCap,
   BarChart,
-  Building,
-  Calendar,
-  TrendingUp,
   LogOut,
   Menu,
   ChevronRight,
   X,
+  ChartLine
 } from "lucide-react"
 import { Button } from "../ui/button"
 import { cn } from "@/lib/utils"
@@ -234,16 +230,17 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
           onClick={isMobile ? closeMobileMenu : undefined}
         />
         <NavItem
-          to="/performance"
-          icon={Award}
-          label="Performance"
+          to="/competency"
+          icon={GraduationCap}
+          label="Competency"
           isCollapsed={isCollapsed && !isMobile}
           onClick={isMobile ? closeMobileMenu : undefined}
         />
         <NavItem
-          to="/competency"
-          icon={GraduationCap}
-          label="Competency"
+          to="/performance"
+          icon={ChartLine}
+           
+          label="Performance"
           isCollapsed={isCollapsed && !isMobile}
           onClick={isMobile ? closeMobileMenu : undefined}
         />
@@ -311,7 +308,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       {/* Mobile Sidebar using Sheet component */}
       {isMobile && (
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px]" closeButton={false}>
+          <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px]">
             <div className="h-full flex flex-col">
               <SidebarContent isMobile={true} />
             </div>

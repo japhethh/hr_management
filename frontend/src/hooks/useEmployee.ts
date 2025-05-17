@@ -38,6 +38,8 @@ export const useEmployee = () => {
   const UpdateEmployeeMutation = useMutation({
     mutationFn: ({ id, userData }: { id: string; userData: Employee }) => employeeApi.updateEmployee(id, userData),
     onSuccess: (data, variables) => {
+      console.log(data)
+
       queryClient.invalidateQueries({ queryKey: ["employee"] })
       queryClient.invalidateQueries({ queryKey: ["employee", variables.id] })
       toast.success("Employee updated successfully!")
@@ -51,7 +53,7 @@ export const useEmployee = () => {
   const deleteEmployee = useMutation({
     mutationFn: (id: string) => employeeApi.deleteEmployee(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employee"] }) 
+      queryClient.invalidateQueries({ queryKey: ["employee"] })
       toast.success("Employee deleted successfully!")
     },
     onError: (error: Error) => {

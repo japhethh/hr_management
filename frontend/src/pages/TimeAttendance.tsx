@@ -28,7 +28,7 @@ export default function TimeAttendancePage() {
 
   // Get employees
   const { getEmployeeQuery } = useEmployee()
-  const { data: employees = [], isLoading: isLoadingEmployees } = getEmployeeQuery
+  const { data: employees = [], } = getEmployeeQuery
 
   // Get time attendance data
   const {

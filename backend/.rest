@@ -80,3 +80,33 @@ Content-Type: application/json
   "application": "Apply with resume and cover letter"
 }
   
+
+  ### Get all Compentency  
+GET {{baseUrl}}/api/recruitment
+   
+  
+
+### Create new Compentency
+POST {{baseUrl}}/api/competency
+Content-Type: application/json
+
+{
+  "title": "Software Developer",
+  "department": "Engineering",
+  "postDate": "2023-07-15T00:00:00.000Z",
+  "status": "open",
+  "application": "Apply with resume and cover letter"
+}
+
+### Get all Performance
+GET  {{baseUrl}}/api/performanceReviews
+
+
+### Create new Performance
+POST {{baseUrl}}/api/performanceReviews
+Content-Type: application/json
+
+{
+ "ReviewID":"",
+ "Employee"
+}

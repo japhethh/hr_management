@@ -25,6 +25,8 @@ export const useUsers = () => {
   const updateUserMutation = useMutation({
     mutationFn: ({ id, userData }: { id: string; userData: User }) => userApi.updateUser(id, userData),
     onSuccess: (data, variables) => {
+
+      console.log(data)
       // Update the user in the cache
       queryClient.invalidateQueries({ queryKey: ["users"] })
       queryClient.invalidateQueries({ queryKey: ["users", variables.id] })

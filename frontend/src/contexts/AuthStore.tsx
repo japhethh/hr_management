@@ -8,11 +8,13 @@ interface AuthState {
 }
 
 interface User {
+  _id?: string
   name: string
   email: string
   password: string
   userName: string
   role: string
+  image?: string
 }
 
 export const apiURL =

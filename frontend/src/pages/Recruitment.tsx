@@ -71,7 +71,6 @@ const RecruitmentDataTable = () => {
     createRecruitmentMutation,
     updateRecruitmentMutation,
     deleteRecruitmentMutation,
-    getRecruitmentById,
   } = useRecruitment()
 
   // State for UI
@@ -231,43 +230,43 @@ const RecruitmentDataTable = () => {
   // Filter and pagination logic
   const filteredData = getRecruitmentsQuery.data
     ? getRecruitmentsQuery.data.filter((recruitment: Recruitment) => {
-        // Text search filter
-        const matchesSearch =
-          recruitment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          recruitment.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          recruitment._id.toLowerCase().includes(searchQuery.toLowerCase())
+      // Text search filter
+      const matchesSearch =
+        recruitment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        recruitment.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        recruitment._id.toLowerCase().includes(searchQuery.toLowerCase())
 
-        if (!matchesSearch) return false
+      if (!matchesSearch) return false
 
-        // Status filter
-        if (filters.status !== "all" && recruitment.status !== filters.status) {
+      // Status filter
+      if (filters.status !== "all" && recruitment.status !== filters.status) {
+        return false
+      }
+
+      // Department filter
+      if (filters.department !== "all" && recruitment.department !== filters.department) {
+        return false
+      }
+
+      // Date range filter
+      if (filters.dateRange.from || filters.dateRange.to) {
+        const postDate = new Date(recruitment.postDate)
+
+        if (filters.dateRange.from && postDate < filters.dateRange.from) {
           return false
         }
 
-        // Department filter
-        if (filters.department !== "all" && recruitment.department !== filters.department) {
-          return false
-        }
-
-        // Date range filter
-        if (filters.dateRange.from || filters.dateRange.to) {
-          const postDate = new Date(recruitment.postDate)
-
-          if (filters.dateRange.from && postDate < filters.dateRange.from) {
+        if (filters.dateRange.to) {
+          const endDate = new Date(filters.dateRange.to)
+          endDate.setHours(23, 59, 59, 999) // End of the day
+          if (postDate > endDate) {
             return false
           }
-
-          if (filters.dateRange.to) {
-            const endDate = new Date(filters.dateRange.to)
-            endDate.setHours(23, 59, 59, 999) // End of the day
-            if (postDate > endDate) {
-              return false
-            }
-          }
         }
+      }
 
-        return true
-      })
+      return true
+    })
     : []
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage)
@@ -281,7 +280,7 @@ const RecruitmentDataTable = () => {
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case "open":
-        return "success"
+        return "default" // Changed from "success" to "default"
       case "closed":
         return "destructive"
       default:
