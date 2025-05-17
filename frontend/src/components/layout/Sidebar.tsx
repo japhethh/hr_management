@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { NavLink } from "react-router-dom"
 import {
@@ -14,11 +15,11 @@ import {
   Menu,
   ChevronRight,
   X,
-  ChartLine
+  LineChartIcon as ChartLine,
 } from "lucide-react"
-import { Button } from "../ui/button"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Sheet, SheetContent } from "../ui/sheet"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 
 interface NavItemProps {
   to: string
@@ -29,13 +30,16 @@ interface NavItemProps {
 }
 
 const NavItem = ({ to, icon: Icon, label, isCollapsed, onClick }: NavItemProps) => {
+  // Using the blue theme colors from the second sidebar example
   return (
     <NavLink
       to={to}
       className={({ isActive }) =>
         cn(
           "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
-          isActive ? "bg-accent text-accent-foreground" : "hover:bg-muted hover:text-muted-foreground",
+          isActive
+            ? "bg-blue-200 text-blue-700" // Active state using blue theme
+            : "hover:bg-blue-100 hover:text-blue-500", // Hover state using blue theme
           isCollapsed ? "justify-center" : "",
         )
       }
@@ -68,8 +72,8 @@ const SubMenu = ({ icon: Icon, label, isCollapsed, children }: SubMenuProps) => 
 
         {/* Tooltip on hover when collapsed */}
         <div className="absolute left-full top-0 ml-2 hidden group-hover:block z-50">
-          <div className="bg-popover shadow-md rounded-md py-2 px-2 text-sm">
-            <div className="font-medium mb-1">{label}</div>
+          <div className="bg-white shadow-md rounded-md py-2 px-2 text-sm border border-blue-100">
+            <div className="font-medium mb-1 text-blue-700">{label}</div>
             {children}
           </div>
         </div>
@@ -83,7 +87,7 @@ const SubMenu = ({ icon: Icon, label, isCollapsed, children }: SubMenuProps) => 
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium cursor-pointer",
-          "hover:bg-muted hover:text-muted-foreground transition-colors",
+          "hover:bg-blue-100 hover:text-blue-500 transition-colors",
         )}
       >
         <div className="flex items-center gap-3">
@@ -178,15 +182,18 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   // Sidebar content - shared between desktop and mobile
   const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-4 bg-white">
         {(!isCollapsed || isMobile) && (
-          <h2 className="font-semibold text-lg transition-opacity duration-200">HR System</h2>
+          <h2 className="font-semibold text-lg transition-opacity duration-200 text-blue-700">HR System</h2>
         )}
         {!isMobile && (
           <Button
             variant="ghost"
             size="sm"
-            className={cn("p-2 rounded-full transition-all duration-200", isCollapsed ? "mx-auto" : "")}
+            className={cn(
+              "p-2 rounded-full transition-all duration-200 text-blue-700 hover:bg-blue-100",
+              isCollapsed ? "mx-auto" : "",
+            )}
             onClick={toggleSidebar}
             title="Toggle sidebar"
           >
@@ -194,7 +201,13 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
           </Button>
         )}
         {isMobile && (
-          <Button variant="ghost" size="sm" className="p-2 rounded-full" onClick={closeMobileMenu} title="Close menu">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="p-2 rounded-full text-blue-700 hover:bg-blue-100"
+            onClick={closeMobileMenu}
+            title="Close menu"
+          >
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -239,7 +252,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         <NavItem
           to="/performance"
           icon={ChartLine}
-           
           label="Performance"
           isCollapsed={isCollapsed && !isMobile}
           onClick={isMobile ? closeMobileMenu : undefined}
@@ -258,7 +270,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             className={({ isActive }) =>
               cn(
                 "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors w-full",
-                isActive ? "bg-accent text-accent-foreground" : "hover:bg-muted hover:text-muted-foreground",
+                isActive ? "bg-blue-200 text-blue-700" : "hover:bg-blue-100 hover:text-blue-500",
               )
             }
             onClick={isMobile ? closeMobileMenu : undefined}
@@ -270,7 +282,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             className={({ isActive }) =>
               cn(
                 "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors w-full",
-                isActive ? "bg-accent text-accent-foreground" : "hover:bg-muted hover:text-muted-foreground",
+                isActive ? "bg-blue-200 text-blue-700" : "hover:bg-blue-100 hover:text-blue-500",
               )
             }
             onClick={isMobile ? closeMobileMenu : undefined}
@@ -281,11 +293,11 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       </nav>
 
       {/* Logout Button */}
-      <div className="p-4 border-t">
+      <div className="p-4 border-t border-blue-100">
         <Button
           variant="ghost"
           className={cn(
-            "w-full gap-3 transition-all duration-200",
+            "w-full gap-3 transition-all duration-200 text-blue-700 hover:bg-blue-100 hover:text-blue-800",
             isCollapsed && !isMobile ? "justify-center" : "justify-start",
           )}
         >
@@ -308,7 +320,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       {/* Mobile Sidebar using Sheet component */}
       {isMobile && (
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px]">
+          <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px] bg-white border-r border-blue-100">
             <div className="h-full flex flex-col">
               <SidebarContent isMobile={true} />
             </div>
@@ -318,7 +330,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 
       {/* Desktop Sidebar */}
       {!isMobile && (
-        <aside className="h-screen border-r bg-background flex-shrink-0 hidden md:block">
+        <aside className="h-screen border-r border-blue-100 bg-white flex-shrink-0 hidden md:block">
           <div
             className={cn(
               "h-full flex flex-col transition-all duration-300 ease-in-out",
