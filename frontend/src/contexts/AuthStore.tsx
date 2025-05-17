@@ -20,7 +20,7 @@ interface User {
 export const apiURL =
   window.location.hostname === "localhost"
     ? "http://localhost:3000"
-    : "kupal kaba boss?";
+    : "https://hr-management-api-hznz.onrender.com";
 
 
 
