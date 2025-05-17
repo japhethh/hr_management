@@ -118,10 +118,6 @@ const updateUser = asyncHandler(async (req, res) => {
   try {
     const { id, formData } = req.body; // Destructure id and the rest of the data
 
-    console.log("Updating user with ID:", id);
-    console.log(formData);
-    // console.log("Data:", data);
-
     const updatedUser = await userModel.findByIdAndUpdate(id, formData, {
       new: true,
     });
