@@ -85,11 +85,12 @@ const testCreate = asyncHandler(async (req, res) => {
         error: error.message,
       });
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new userModel({
       name,
       email,
-      password,
+      password: hashedPassword,
       image: imageUrl,
       role: "admin",
     });
@@ -117,7 +118,6 @@ const testCreate = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   try {
     const { id, formData } = req.body; // Destructure id and the rest of the data
-
     const updatedUser = await userModel.findByIdAndUpdate(id, formData, {
       new: true,
     });
