@@ -47,6 +47,9 @@ Content-Type:application/json
 ### Get all Employee 
 GET {{baseUrl}}/api/employee
 
+### Get all EmployeeNotif 
+GET {{baseUrl}}/api/employee/notif
+
 ### Create Employee
 POST {{baseUrl}}/api/employee
 Content-Type:application/json

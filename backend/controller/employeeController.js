@@ -27,3 +27,18 @@ export const deleteEmployee = expressAsyncHandler(async (req, res) => {
   const result = await employeeService.deleteEmployee(req.params.id);
   res.status(200).json(result);
 });
+
+export const notif = expressAsyncHandler(async (req, res) => {
+  console.log(req.body);
+  const newEmployee = await employeeService.notifIntegration(req.body);
+
+  if (!newEmployee) res.status(404).json({ message: "Employee not found!" });
+  res.status(201).json(newEmployee);
+});
+export const notifGet = expressAsyncHandler(async (req, res) => {
+
+  const newEmployee = await employeeService.notifIntegrationGet();
+
+  if (!newEmployee) res.status(404).json({ message: "Employee not found!" });
+  res.status(200).json(newEmployee);
+});

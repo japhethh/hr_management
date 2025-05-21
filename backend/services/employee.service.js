@@ -1,9 +1,16 @@
 import employeeModel from "../models/employeeModel.js";
+import notifModel from "../models/notifModel.js";
 
 class EmployeeService {
   // Class name should be PascalCase
   async createEmployee(userData) {
+    // Integration
+
+    const newNotif = new notifModel({ newNotif: userData });
+
+    await newNotif.save();
     const newEmployee = new employeeModel(userData);
+
     const user = await newEmployee.save();
     return user;
   }
@@ -54,8 +61,21 @@ class EmployeeService {
     return { message: "Employee Deleted Successfully" };
   }
 
+  // Class name should be PascalCase
+  async notifIntegration(userData) {
+    // Integration
+    const newNotif = new notifModel(userData);
 
-  
+    const user = await newNotif.save();
+    return user;
+  }
+  async notifIntegrationGet() {
+    // Integration
+
+    const data = await notifModel.find({});
+
+    return data;
+  }
 }
 
 export default new EmployeeService(); // Export an instance
