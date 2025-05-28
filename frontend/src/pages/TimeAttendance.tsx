@@ -28,7 +28,7 @@ export default function TimeAttendancePage() {
 
   // Get employees
   const { getEmployeeQuery } = useEmployee()
-  const { data: employees = [], } = getEmployeeQuery
+  const { data: employees = [] } = getEmployeeQuery
 
   // Get time attendance data
   const {
@@ -155,7 +155,7 @@ export default function TimeAttendancePage() {
                   <SelectItem value="all">All Employees</SelectItem>
                   {employees.map((employee) => (
                     <SelectItem key={employee._id} value={employee._id as string}>
-                      {employee.FirstName} {employee.LastName}
+                      {employee?.FirstName || "Unknown"} {employee?.LastName || "Employee"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -184,7 +184,7 @@ export default function TimeAttendancePage() {
                 <SelectContent>
                   {employees.map((employee) => (
                     <SelectItem key={employee._id} value={employee._id as string}>
-                      {employee.FirstName} {employee.LastName}
+                      {employee?.FirstName || "Unknown"} {employee?.LastName || "Employee"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -256,6 +256,7 @@ export default function TimeAttendancePage() {
             <CardContent className="p-0">
               <TimeAttendanceTable
                 timeAttendances={allTimeAttendances}
+                employees={employees}
                 isLoading={isLoadingAllTimeAttendances}
                 onClockIn={handleClockIn}
                 onClockOut={handleClockOut}
@@ -272,6 +273,7 @@ export default function TimeAttendancePage() {
             <CardContent className="p-0">
               <TimeAttendanceTable
                 timeAttendances={employeeTimeAttendances}
+                employees={employees}
                 isLoading={isLoadingEmployeeTimeAttendances}
                 onClockIn={handleClockIn}
                 onClockOut={handleClockOut}
@@ -288,6 +290,7 @@ export default function TimeAttendancePage() {
             <CardContent className="p-0">
               <TimeAttendanceTable
                 timeAttendances={dateRangeTimeAttendances}
+                employees={employees}
                 isLoading={isLoadingDateRangeTimeAttendances}
                 onClockIn={handleClockIn}
                 onClockOut={handleClockOut}

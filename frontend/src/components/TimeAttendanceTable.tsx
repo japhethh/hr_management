@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/utils"
 
 interface TimeAttendanceTableProps {
   timeAttendances: TimeAttendance[]
+  employees: Employee[]
   isLoading: boolean
   onClockIn?: (employeeId: string) => void
   onClockOut?: (employeeId: string) => void
@@ -19,6 +20,7 @@ interface TimeAttendanceTableProps {
 
 export const TimeAttendanceTable: React.FC<TimeAttendanceTableProps> = ({
   timeAttendances,
+  employees,
   isLoading,
   onClockIn,
   onClockOut,
@@ -26,10 +28,22 @@ export const TimeAttendanceTable: React.FC<TimeAttendanceTableProps> = ({
   onMarkLeave,
   onDelete,
 }) => {
-  // Helper function to get employee name
-  const getEmployeeName = (employee: string | Employee): string => {
-    if (typeof employee === "string") return employee
-    return `${employee.FirstName} ${employee.LastName}`
+  // Helper function to get employee name by ID
+  const getEmployeeName = (employeeId: string | Employee): string => {
+    if (typeof employeeId === "object" && employeeId?.FirstName) {
+      return `${employeeId?.FirstName} ${employeeId?.LastName}`
+    }
+
+    // If employeeId is a string, find the employee in the employees array
+    if (typeof employeeId === "string") {
+      const employee = employees.find((emp) => emp._id === employeeId)
+      if (employee && employee.FirstName && employee.LastName) {
+        return `${employee.FirstName} ${employee.LastName}`
+      }
+      return "Unknown Employee"
+    }
+
+    return "Unknown Employee"
   }
 
   // Helper function to format time
